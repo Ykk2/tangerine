@@ -6,18 +6,10 @@
 # the request data. This is used to determine the request method, path,
 # headers, and body.
 
-from typing import Dict
-from response import Response
-import socket
-import json
-
-from typing import Dict
-from response import Response
-import socket
-import json
 
 class Request:
-    """Represents an HTTP request.
+    """
+    Request class represents an HTTP request.
 
     Attributes:
         method: A string indicating the HTTP method.
