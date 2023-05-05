@@ -5,6 +5,7 @@
 # Description: This file contains the Auth class which is used to store the
 # auth status of a user. This is used to determine if a user is logged in
 # or not. And also provides the logic for logging in and out.
+
 import bcrypt
 import datetime
 from key_lime import KeyLime
@@ -45,6 +46,7 @@ class Yuzu:
 
         except Exception as e:
             print(f'Error authenticating user: {e}')
+
             return False
 
     def generate_auth_token(self, user_id: str, email: str) -> str:
@@ -57,6 +59,7 @@ class Yuzu:
         }
         return jwt.encode(token_payload, secret_key, algorithm='HS256')
 
+
     def verify_auth_token(self, token: str) -> dict:
         try:
             secret_key = self.get_config('SECRET_KEY')
@@ -68,8 +71,6 @@ class Yuzu:
         except jwt.InvalidTokenError:
             print("Invalid token")
             return None
-
-
 
 
     def sign_up(self,user_data: dict) -> dict:
@@ -90,24 +91,19 @@ class Yuzu:
             return None
 
 
-
     def login(self, email: str, password: str) -> Tuple[str, str]:
         print(self.authenticate(email, password))
         if self.authenticate(email, password):
             try:
                 db = self.client['mydatabase']
                 users = db['users']
-
                 query = {'email': email}
                 user_data = users.find_one(query)
-                print(user_data, "USER_DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
                 if user_data:
                     self.auth = True
                     self.user = user_data
-                    print(self.user, "SELF.USER")
                     token = self.generate_auth_token(str(user_data["_id"]), email)
-                    print(token, "TOKEN!!!!!!!!!!!!!")
                     return str(user_data["_id"]), token
                 else:
                     return None, None

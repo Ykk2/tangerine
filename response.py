@@ -5,6 +5,7 @@
 # Description: This file contains the Response class which is used to store
 # the response data. This is used to determine the response status code,
 # headers, and body.
+
 from typing import TypeVar, Dict, Optional
 import json
 
@@ -77,9 +78,14 @@ STATUS_CODES = {
 
 class Response:
     """
-        The Response class is the class that is stores in the context object.
-        It provides a way to construct the response that will be sent to the client.
+        Response class represents an HTTP response.
+
+        Attributes:
+            status_code: A string indicating the HTTP method.
+            headers: A dictionary mapping header names to values.
+            body: A string containing the HTTP response body.
     """
+
     def __init__(self, status_code=404, headers=None, body=''):
         # Set the status code, headers, and body of the response.
         self.status_code = status_code
@@ -112,8 +118,10 @@ class Response:
 
 
     def send(self, conn):
-        # Send the response to the client.
-        # This function sends the response to the client.
+        """
+        This function sends the response to the client
+        """
+
         conn.sendall(self.to_bytes())
 
     def to_dict(self) -> dict:

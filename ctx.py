@@ -68,16 +68,6 @@ class Ctx:
                  auth: bool = False
                  ) -> None:
 
-        """
-        Initialize a new Ctx object.
-
-        :param request: The request object.
-        :param response: The response object.
-        :param keychain: Optional keychain object.
-        :param auth: Optional boolean flag for authentication status.
-        :param sock: Socket object.
-        """
-
         self.request = request
         self.response = response
         self.keychain = keychain
@@ -107,7 +97,8 @@ class Ctx:
         return self.response
 
     # !@#$ split this into two methods, one for successful methods, one for error methods
-    def send(self: T, status: Optional[int] = None,
+    def send(self: T,
+             status: Optional[int] = None,
              body: Optional[Union[str, bytes]] = None,
              headers: Optional[Dict[str, str]] = None,
              content_type: Optional[str] = None
@@ -136,6 +127,7 @@ class Ctx:
             # Set default Content-Type
             self.response.headers['Content-Type'] = 'application/json'
 
+
     def send_to_client(self: T) -> None:
         """
         Send the response to the client using the socket.
@@ -145,6 +137,7 @@ class Ctx:
             self.sock.sendall(self.response.to_bytes())
         else:
             raise ValueError("Socket not set for the context")
+
 
     def get_req_header(self: T, header: str) -> str:
         """
@@ -156,6 +149,7 @@ class Ctx:
 
         return self.request.headers.get(header)
 
+
     def set_res_header(self: T, header: str, value: str) -> None:
         """
         Set a specific response header value.
@@ -166,6 +160,7 @@ class Ctx:
 
         self.response.headers[header] = value
 
+
     def set_auth(self: T, auth: bool) -> None:
         """
         Set the authentication status.
@@ -175,6 +170,7 @@ class Ctx:
 
         self.auth = auth
 
+
     @property
     def body(self):
         """
@@ -182,6 +178,7 @@ class Ctx:
         """
 
         return self.response.body
+
 
     @body.setter
     def body(self, value):
@@ -196,6 +193,7 @@ class Ctx:
         else:
             self.response.body = value
 
+
     def set_socket(self: T, sock: socket) -> None:
         """
         Set the socket for the context.
@@ -204,6 +202,7 @@ class Ctx:
         """
 
         self.sock = sock
+
 
     def __getitem__(self, key: str) -> Any:
         if key == "headers":
@@ -215,11 +214,13 @@ class Ctx:
         else:
             raise KeyError(f"Invalid key: {key}")
 
+
     def __setitem__(self, key: str, value: Any) -> None:
         if key == "user":
             self.user = value
         else:
             raise KeyError(f"Invalid key: {key}")
+
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -228,6 +229,7 @@ class Ctx:
             'socket': f"<socket fd={self.sock.fileno()}>" if self.sock else None,
             'auth': self.auth,
         }
+
 
     def __repr__(self) -> str:
         """
