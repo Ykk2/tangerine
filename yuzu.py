@@ -100,7 +100,7 @@ class Yuzu:
 
                 query = {'email': email}
                 user_data = users.find_one(query)
-                print(user_data)
+                print(user_data, "USER_DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
                 if user_data:
                     self.auth = True

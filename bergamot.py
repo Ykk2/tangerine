@@ -6,11 +6,14 @@
 
 import re
 import smtplib
-import asyncio
 from typing import Dict, Optional
 
 class Bergamot:
-    def __init__(self, email: str, password: str, custom_config: Optional[Dict] = None):
+    def __init__(self,
+                 email: str,
+                 password: str,
+                 custom_config: Optional[Dict] = None):
+
         self.email = email
         self.password = password
 

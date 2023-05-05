@@ -1,59 +1,72 @@
 """
 
-
 File: ctx.py
-Description: This file contains the Ctx class which is used to store
+
+Description:
+
+This file contains the Ctx class which is used to store
 the request, response, keychain objects, and some useful methods.
-from typing import Callable, TypeVar, Optional, Union, Dict, Any
+
 """
 
-from typing import Callable, TypeVar, Optional, Union, Dict, Any
+from typing import TypeVar, Optional, Union, Dict, Any
 from socket import socket
 from request import Request
 from response import Response
 from key_lime import KeyLime
-from yuzu import Yuzu
-T = TypeVar("T")
 
+T = TypeVar("T")
 
 class Ctx:
     """
-    The Ctx class represents the context of an HTTP request/response cycle.
+    The Ctx class represents the context (information and state) of an HTTP request/response cycle.
 
     Attributes:
-        request (Request): The incoming HTTP request object.
-        response (Response): The outgoing HTTP response object.
-        keychain (Optional[KeyLime]): The KeyLime object containing any session
-            information.
-        auth (bool): A boolean indicating whether the request is authenticated
-            or not.
-        sock (Optional[socket]): The socket object used to send the response.
+        request: The incoming HTTP request object.
+        response: The outgoing HTTP response object.
+        keychain: The KeyLime object containing any session information.
+        auth: A boolean indicating whether the request is authenticated or not.
+        sock: The socket object used to send the response.
 
     Methods:
         req_intercept(request: Request) -> Request:
             Intercepts the incoming request and returns it.
+
         res_intercept(response: Response) -> Response:
             Intercepts the outgoing response and returns it.
-        send(status: Optional[int] = None, body: Optional[Union[str, bytes]] = None,
-             headers: Optional[Dict[str, str]] = None, content_type: Optional[str] = None) -> None:
-            Sends the outgoing response with the given status code, body, headers
-            and content type.
+
+        send(status: Optional[int] = None,
+             body: Optional[Union[str, bytes]] = None,
+             headers: Optional[Dict[str, str]] = None,
+             content_type: Optional[str] = None
+             ) -> None:
+            Sends the outgoing response with the given status code, body, headers and content type.
+
         send_to_client() -> None:
             Sends the outgoing response to the client.
+
         get_req_header(header: str) -> str:
             Returns the value of the specified header in the incoming request.
+
         set_res_header(header: str, value: str) -> None:
             Sets the value of the specified header in the outgoing response.
+
         set_auth(auth: bool) -> None:
             Sets the authenticated status of the request.
+
         set_socket(sock: socket) -> None:
             Sets the socket object used to send the response.
+
         __repr__() -> str:
             Returns a string representation of the Ctx object.
-
     """
 
-    def __init__(self: T, request: Request, response: Response, keychain: Optional[KeyLime] = None, auth: bool = False) -> None:
+    def __init__(self: T,
+                 request: Request,
+                 response: Response,
+                 keychain: Optional[KeyLime] = None,
+                 auth: bool = False
+                 ) -> None:
 
         """
         Initialize a new Ctx object.
@@ -94,7 +107,11 @@ class Ctx:
         return self.response
 
     # !@#$ split this into two methods, one for successful methods, one for error methods
-    def send(self: T, status: Optional[int] = None, body: Optional[Union[str, bytes]] = None, headers: Optional[Dict[str, str]] = None, content_type: Optional[str] = None) -> None:
+    def send(self: T, status: Optional[int] = None,
+             body: Optional[Union[str, bytes]] = None,
+             headers: Optional[Dict[str, str]] = None,
+             content_type: Optional[str] = None
+             ) -> None:
         """
         Send a response to the client with the specified status, body, headers, and content type.
 
@@ -188,7 +205,6 @@ class Ctx:
 
         self.sock = sock
 
-
     def __getitem__(self, key: str) -> Any:
         if key == "headers":
             return self.request.headers
@@ -213,12 +229,9 @@ class Ctx:
             'auth': self.auth,
         }
 
-
-    def __repr__(self: T) -> str:
+    def __repr__(self) -> str:
         """
         Return a string representation of the Ctx object.
-
-        :return: String representation of the Ctx object.
         """
 
         return f'<Ctx: {self.request} {self.response}>'
