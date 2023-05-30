@@ -9,8 +9,8 @@ from typing import Callable, TypeVar, Optional, Union, Dict, Any
 from socket import socket
 from .request import Request
 from .response import Response
-from .key_lime import KeyLime
 import json
+from http.cookies import SimpleCookie
 
 T = TypeVar("T")
 
@@ -52,7 +52,7 @@ class Ctx:
 
     """
 
-    def __init__(self: T, request: Request, response: Response, keychain: Optional[KeyLime] = None, auth: bool = False) -> None:
+    def __init__(self: T, request: Request, response: Response, keychain: Optional[T] = None, auth: bool = False) -> None:
 
         """
         Initialize a new Ctx object.
@@ -69,6 +69,7 @@ class Ctx:
         self.keychain = keychain
         self.auth = auth
         self.sock: socket or None = None
+        self.user = None
 
     def req_intercept(self: T, request: Request) -> Request:
         """
@@ -91,6 +92,24 @@ class Ctx:
 
         self.response = response
         return self.response
+
+    def set_cookie(self: T, key: str, value: str, **kwargs) -> None:
+        """
+        Set a cookie in the response headers.
+
+        :param key: The name of the cookie.
+        :param value: The value of the cookie.
+        :param kwargs: Additional attributes for the cookie such as 'expires', 'path', etc.
+        """
+        cookie = SimpleCookie()
+        cookie[key] = value
+        for attr, val in kwargs.items():
+            cookie[key][attr] = val
+
+        if 'Set-Cookie' in self.response.headers:
+            self.response.headers['Set-Cookie'] += f', {cookie[key].OutputString()}'
+        else:
+            self.response.headers['Set-Cookie'] = cookie[key].OutputString()
 
     # !@#$ split this into two methods, one for successful methods, one for error methods
     def send(self: T, status: Optional[int] = None, body: Optional[Union[str, bytes]] = None, headers: Optional[Dict[str, str]] = None, content_type: Optional[str] = None) -> None:
@@ -188,6 +207,13 @@ class Ctx:
 
         self.sock = sock
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'request': self.request.to_dict(),
+            'response': self.response.to_dict(),
+            'socket': f"<socket fd={self.sock.fileno()}>" if self.sock else None,
+            'auth': self.auth,
+        }
 
     def __getitem__(self, key: str) -> Any:
         if key == "headers":
@@ -195,7 +221,7 @@ class Ctx:
         elif key == "body":
             return self.request.body
         elif key == "user":
-            return self.user
+            return self.ctx.user
         else:
             raise KeyError(f"Invalid key: {key}")
 
@@ -204,14 +230,6 @@ class Ctx:
             self.user = value
         else:
             raise KeyError(f"Invalid key: {key}")
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            'request': self.request.to_dict(),
-            'response': self.response.to_dict(),
-            'socket': f"<socket fd={self.sock.fileno()}>" if self.sock else None,
-            'auth': self.auth,
-        }
 
 
     def __repr__(self: T) -> str:
