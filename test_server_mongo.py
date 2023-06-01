@@ -3,13 +3,18 @@ from pymongo import MongoClient
 from tangerine_auth import Yuzu, KeyLime
 import json
 from tangerine.middleware_extension import cors_middleware
+from csrf import CSRF
 
 app = Tangerine(debug_level=1)
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://richardkwon2:x42aNo6bSIQjA3Ro@cluster0.hh5mefs.mongodb.net/')
 keychain = KeyLime({
         "SECRET_KEY": "ILOVECATS",
 })
+
+csrf = CSRF()
+app.use(csrf.csrf_middleware)
 app.use(cors_middleware)
+
 
 def get_user_by_email(email):
     db = client['mydatabase']
@@ -97,5 +102,6 @@ api_router.get('/protected', get_protected_content)
 
 app.use(hello_middle)
 app.use(auth.jwt_middleware)
+
 app.use_router(api_router)
 app.start()

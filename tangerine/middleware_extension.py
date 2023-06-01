@@ -1,4 +1,3 @@
-from flask_cors import CORS
 
 
 def cors_middleware(ctx, next_middleware):
