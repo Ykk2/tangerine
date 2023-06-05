@@ -7,6 +7,7 @@
 import hashlib
 import secrets
 
+
 class Token:
     def __init__(self, hash=None):
         self.value = None
@@ -23,21 +24,19 @@ class CSRF:
         self.token_class = Token(hash)
         self.token = self.token_class.generate(hash)
 
-
     def validate(self, ctx):
         client_token = ctx.request
         server_token = self.token
         return client_token == server_token
 
     def csrf_middleware(self, ctx, next):
-        print("CSRF TOKEN BEING RUN<><><><><><><><><><><><><><><>")
-        csrf_token = ctx.request.cookies.get('csrf_token', None)
 
+        print(type(ctx.request.to_dict()['headers']['Cookie']), "ASDFAKLSFJDHAKLSDFJAOSDFHASODF")
+        csrf_token = None
+        # csrf_token = ctx.request.headers["Cookie"].get('csrf_token', None)
         if not csrf_token:
-            ctx.set_cookie('csrf_token', self.token)
-            print("CSRF TOKEN BEING SET HERE<><><><><><><><><><><><><><><>")
+            ctx.set_cookie('csrf_token', self.token, secure=True, httponly=True, samesite='Lax', path='/')
         else:
             if not self.validate(csrf_token):
-                print("CSRF TOKEN NOT VALIDATED<><><><><><><><><><><><><><><>")
                 return ctx.send('404', 'Unauthorized')
         next()
